@@ -111,6 +111,5 @@ module.exports = {
   getSensorById,
   updateSensorById,
   deleteSensorById,
-  getSensorsByDevice,
 
 };
