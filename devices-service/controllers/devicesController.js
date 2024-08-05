@@ -109,6 +109,20 @@ const getDeviceByMacAddress = async (req, res) => {
 };
 
 
+const getDeviceTopicByMacAddress = async (req, res) => {
+  const { macAddress } = req.params;
+  try {
+    const device = await Device.findOne({ macAddress });
+    if (!device) {
+      return res.status(404).json({ message: 'Device not found' });
+    }
+    res.status(200).json(device);
+    broadcast(req.app.locals.wss, { message: 'Device fetched', device });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createDevice,
   getAllDevices,
