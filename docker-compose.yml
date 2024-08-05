@@ -1,0 +1,98 @@
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongod
+    ports:
+      - "27017:27017"
+    networks:
+      - siwar-network
+    volumes:
+      - mongo-data:/data/db
+
+  user-service:
+    build: ./userservice
+    container_name: userservice
+    ports:
+      - "3008:3008"
+    networks:
+      - siwar-network
+    environment:
+      - MONGO_URL=mongodb://mongod:27017/smartinnov
+      - UPLOAD_PATH=/uploads  
+    depends_on:
+      - mongodb
+    volumes:
+      - ./userservice/uploads:/usr/src/app/uploads
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "3389:3389"
+    networks:
+      - siwar-network
+    environment:
+      - MONGO_URL=mongodb://mongod:27017/smartinnov
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_USER=esmateddinekhamassi@gmail.com
+      - EMAIL_PASS=eupsnghepyufrgjw
+    depends_on:
+      - mongodb
+
+  devices-service:
+    build: ./devices-service
+    container_name: devices-service
+    ports:
+      - "4002:4002"
+    networks:
+      - siwar-network
+    environment:
+      - MONGO_URL=mongodb://mongod:27017/smartinnov
+    depends_on:
+      - mongodb
+
+  parameters-service:
+    build: ./parameters-service
+    container_name: parameters-service
+    ports:
+      - "3004:3004"
+    networks:
+      - siwar-network
+    environment:
+      - MONGO_URL=mongodb://mongod:27017/smartinnov
+    depends_on:
+      - mongodb
+
+  sensors-service:
+    build: ./sensors-service
+    container_name: sensors-service
+    ports:
+      - "3001:3001"
+    networks:
+      - siwar-network
+    environment:
+      - MONGO_URL=mongodb://mongod:27017/smartinnov
+    depends_on:
+      - mongodb
+  
+  notifications-service:
+    build: ./notifications-service
+    container_name: notifications-service
+    ports:
+      - "3010:3010"
+    networks:
+      - siwar-network
+    environment:
+      - MONGO_URL=mongodb://mongod:27017/smartinnov
+    depends_on:
+      - mongodb
+
+networks:
+  siwar-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
